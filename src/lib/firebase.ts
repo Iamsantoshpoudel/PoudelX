@@ -37,7 +37,7 @@ try {
   console.log('Firebase initialized successfully');
 } catch (error: any) {
   if (error.code !== 'app/duplicate-app') {
-    console.error('Firebase initialization error:', error);
+    // console.error('Firebase initialization error:', error);
     throw error;
   }
   app = getApp();

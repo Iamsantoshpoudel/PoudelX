@@ -7,6 +7,7 @@ import { componentTagger } from "lovable-tagger";
 export default defineConfig(({ mode }) => ({
   base: "./", // Correct base path for Vercel
   server: {
+    historyApiFallback: true,
     host: "localhost", // Secure for local dev
     port: 8080,
   },
