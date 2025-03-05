@@ -73,14 +73,13 @@ santosh.introduce();
 </h1>
 
 <h3>
-This is a modern real-time chat application built using Vite + React for a fast and optimized frontend. The app leverages Firebase for authentication and real-time database functionality, Lobeable for managing WebSocket connections efficiently, shadcn/ui for a sleek and responsive UI, and Vercel for seamless deployment and hosting.
+This is a modern real-time chat application built using Vite + React for a fast and optimized frontend. The app leverages Firebase for authentication and real-time database functionality, shadcn/ui for a sleek and responsive UI, and Vercel for seamless deployment and hosting.
 </h3>
 
 Key Features
 ✅ Fast & Optimized – Powered by Vite for instant loading and HMR (Hot Module Replacement). <br>
 ✅ Real-Time Messaging – Uses Firebase Firestore for instant message syncing across users.<br>
 ✅ Authentication – Firebase Authentication with Google, email/password, or anonymous login.<br>
-✅ Scalable WebSockets – Lobeable ensures efficient, low-latency communication.<br>
 ✅ Beautiful UI – Uses shadcn/ui for modern, accessible, and customizable components.<br>
 ✅ Dark Mode Support – Fully responsive with automatic dark mode detection.<br>
 ✅ Deployed on Vercel – Lightning-fast and globally available hosting with automatic CI/CD.
@@ -88,7 +87,6 @@ Key Features
 Tech Stack
 Frontend: Vite + React + shadcn/ui
 Real-time Database & Auth: Firebase
-WebSockets & Presence: Lobeable
 Hosting & Deployment: Vercel
 This app provides a blazing-fast, scalable, and modern chat experience for real-time communication. 🚀💬
 
