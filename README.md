@@ -69,7 +69,7 @@ santosh.introduce();
 ##
 
 <h1 style="text-align: center;">
-🚀 React Chat App with Firebase, Lobeable, shadcn/ui & Vercel !
+🚀 React Chat App 
 </h1>
 
 <h3>
@@ -125,6 +125,9 @@ VITE_FIREBASE_APP_ID=your-app-id
 ```
 ```
 npm run dev
+```
+```
+npm run build 
 ```
 <h3>
 This will start the Vite development server and the app will be available at http://localhost:8080. You can now test and modify the app locally.
