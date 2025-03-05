@@ -1,0 +1,19 @@
+{
+    "rewrites": [
+      {
+        "source": "/(.*)",
+        "destination": "/index.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "/(.*)",
+        "headers": [
+          {
+            "key": "Content-Security-Policy",
+            "value": "default-src 'self' https://www.santoshpoudel06.com.np; script-src 'self' https://www.santoshpoudel06.com.np https://*.firebase.com https://*.googleapis.com https://*.gstatic.com; style-src 'self' https://www.santoshpoudel06.com.np;"
+          }
+        ]
+      }
+    ]
+  }
