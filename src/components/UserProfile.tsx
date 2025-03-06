@@ -3,7 +3,7 @@ import { User } from '@/lib/types';
 import { Button } from './ui/button';
 import { ChevronLeft, Mail, Lock, LogOut } from 'lucide-react';
 import { Input } from './ui/input';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useChatStore } from '@/lib/store';
 import { updateUserStatus } from '@/lib/firebase';
 import { toast } from './ui/use-toast';
@@ -27,9 +27,22 @@ const UserProfile = ({ user, showBackButton, onBack }: UserProfileProps) => {
   const isOwnProfile = currentUser?.id === user.id;
   const auth = getAuth();
 
+  useEffect(() => {
+    setName(user.name);
+    setEmail(user.email || '');
+  }, [user]);
+
   const handleSave = async () => {
     try {
-      // Validate password confirmation if password is being changed
+      if (!name.trim()) {
+        toast({
+          title: "Error",
+          description: "Name cannot be empty",
+          variant: "destructive"
+        });
+        return;
+      }
+
       if (password.trim() && password !== confirmPassword) {
         toast({
           title: "Error",
@@ -39,17 +52,17 @@ const UserProfile = ({ user, showBackButton, onBack }: UserProfileProps) => {
         return;
       }
 
-      // Update name
+      // Create updated user object
       const updatedUser = {
         ...user,
         name: name.trim(),
         email: email.trim()
       };
 
+      // Update user in the database
       await updateUserStatus(updatedUser);
-      setCurrentUser(updatedUser);
       
-      // Update email if changed and user is authenticated
+      // Update user in auth if email changed
       if (auth.currentUser && email !== user.email && email.trim()) {
         await updateEmail(auth.currentUser, email.trim());
       }
@@ -57,8 +70,19 @@ const UserProfile = ({ user, showBackButton, onBack }: UserProfileProps) => {
       // Update password if provided
       if (auth.currentUser && password.trim()) {
         await updatePassword(auth.currentUser, password.trim());
-        setPassword(''); // Clear password field after update
-        setConfirmPassword(''); // Clear confirm password field
+        setPassword('');
+        setConfirmPassword('');
+      }
+      
+      // Update user in state
+      setCurrentUser(updatedUser);
+      
+      // Persist user in sessionStorage and cookies for persistence
+      if (updatedUser.id) {
+        sessionStorage.setItem('currentUser', JSON.stringify(updatedUser));
+        const date = new Date();
+        date.setTime(date.getTime() + (7 * 24 * 60 * 60 * 1000));
+        document.cookie = `currentUser=${encodeURIComponent(JSON.stringify(updatedUser))}; expires=${date.toUTCString()}; path=/`;
       }
       
       setIsEditing(false);
@@ -67,6 +91,7 @@ const UserProfile = ({ user, showBackButton, onBack }: UserProfileProps) => {
         description: "Your profile has been updated successfully."
       });
     } catch (error: any) {
+      console.error("Profile update error:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to update profile. Please try again.",
@@ -77,10 +102,8 @@ const UserProfile = ({ user, showBackButton, onBack }: UserProfileProps) => {
 
   const handleLogout = async () => {
     try {
-      // Sign out from Firebase
       await signOut(auth);
       
-      // Clear user from store
       setCurrentUser({
         id: '',
         name: '',
@@ -88,13 +111,9 @@ const UserProfile = ({ user, showBackButton, onBack }: UserProfileProps) => {
         lastSeen: new Date().toISOString()
       });
       
-      // Clear user data from session storage
       sessionStorage.removeItem('currentUser');
-      
-      // Clear user data from cookies
       document.cookie = 'currentUser=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
       
-      // Navigate to landing page
       navigate('/');
       
       toast({

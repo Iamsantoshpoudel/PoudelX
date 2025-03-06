@@ -1,7 +1,8 @@
+
 import { useState, useEffect } from 'react';
 import { useChatStore } from '@/lib/store';
 import { User, Note } from '@/lib/types';
-import { Search, PlusCircle, FileText, Plus, Trash2 } from 'lucide-react';
+import { Search, PlusCircle, Plus, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useNavigate } from 'react-router-dom';
 import Loader from '@/components/Loader';
@@ -10,6 +11,8 @@ import NoteItem from '@/components/NoteItem';
 import NoteDetailModal from '@/components/NoteDetailModal';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { toast } from '@/components/ui/use-toast';
+
+
 
 const UserList = () => {
   const { onlineUsers, currentUser, messages, notes, deleteNote } = useChatStore();
@@ -71,28 +74,20 @@ const UserList = () => {
     setSelectedNote(null);
   };
 
-  const onlineUsersFiltered = onlineUsers.filter(user => 
-    user.id !== currentUser?.id && 
-    user.isOnline
-  );
-  {/* handle note  */}
   const myNote = notes
     .filter(note => note.creatorId === currentUser?.id)
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
   
-  const otherUsersNotes = notes
-    .filter(note => note.creatorId !== currentUser?.id)
-    .reduce((acc: Note[], note) => {
-      const existingNote = acc.find(n => n.creatorId === note.creatorId);
-      if (!existingNote) {
-        acc.push(note);
-      } else if (new Date(note.createdAt).getTime() > new Date(existingNote.createdAt).getTime()) {
-        const index = acc.findIndex(n => n.creatorId === note.creatorId);
-        acc[index] = note;
-      }
-      return acc;
-    }, [])
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  const userNotesMap = new Map<string, Note>();
+  
+  notes.forEach(note => {
+    if (note.creatorId === currentUser?.id) return;
+    
+    const existingNote = userNotesMap.get(note.creatorId);
+    if (!existingNote || new Date(note.createdAt) > new Date(existingNote.createdAt)) {
+      userNotesMap.set(note.creatorId, note);
+    }
+  });
 
   const filteredAndSortedUsers = onlineUsers
     .filter(user => 
@@ -100,6 +95,9 @@ const UserList = () => {
       user.name.toLowerCase().includes(searchQuery.toLowerCase())
     )
     .sort((a, b) => {
+      if (a.isOnline && !b.isOnline) return -1;
+      if (!a.isOnline && b.isOnline) return 1;
+      
       const aLastMessage = getLastMessage(a.id);
       const bLastMessage = getLastMessage(b.id);
       
@@ -116,134 +114,115 @@ const UserList = () => {
 
   return (
     <div className="flex flex-col h-full bg-background">
-      <div className="p-4 border-b border-border">
+      <div className="p-4 pb-3 flex justify-between items-center">
         <div className="flex items-center">
-          <img 
-            src="/Logo.svg" 
-            alt="Logo" 
-            className="w-8 h-8 mr-2"
-          />
-          <h2 className="text-xl font-semibold">Chats</h2>
+          <img src="/Logo.svg" alt="Logo" className="h-8 w-auto" />
+          <h3 className="text-xl font-semibold pl-[8px]">Poudel X</h3>
         </div>
-        <div className="relative mt-4">
+        <div className="flex space-x-3">
+          {/* You can add menu buttons here if needed */}
+          
+        </div>
+      </div>
+      
+      <div className="px-4 mb-3">
+        <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
           <Input
             type="text"
-            placeholder="Search messages..."
+            placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 w-full bg-muted/50"
+            className="pl-9 w-full bg-gray-100 border-none rounded-full"
           />
         </div>
       </div>
 
-      <div className="p-4 pt-8 overflow-x-auto whitespace-nowrap border-b border-gray-200">
-        <div className="flex space-x-4">
-          {currentUser && (
-            <div className="flex flex-col items-center cursor-pointer relative mt-8">
-              {myNote && (
-                <div 
-                  className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-white px-3 py-2 rounded-full shadow-sm border border-gray-200 text-xs max-w-[180px] flex items-center gap-1"
-                  onClick={() => handleNoteClick(myNote)}
-                >
-                  <span className="truncate">
-                    {myNote.content}
-                  </span>
-                  <Trash2 
-                    className="h-3.5 w-3.5 text-gray-400 hover:text-red-500 flex-shrink-0"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteNote(myNote.id);
-                    }}
-                  />
-                </div>
-              )}
-              
-              {!myNote && (
-                <div 
-                  className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-white px-3 py-2 rounded-full shadow-sm border border-gray-200 text-xs text-gray-400"
-                  onClick={handleOpenNoteModal}
-                >
-                  Share a thought...
-                </div>
-              )}
-              
-              <div className="relative">
-                <Avatar className="w-14 h-14 border border-gray-200">
-                  <AvatarFallback className="bg-gray-200 text-lg">
-                    {currentUser.name[0].toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <div 
-                  onClick={handleOpenNoteModal} 
-                  className="absolute -bottom-1 -right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-sm border border-gray-200 cursor-pointer"
-                >
-                  <Plus className="w-4 h-4 text-[#46C8B6]" />
-                </div>
-              </div>
-              <div className="text-xs mt-1 text-gray-500 max-w-[70px] truncate">
-                {myNote ? "My Notes" : "Create Note"}
+      <div className="px-4 pb-4 overflow-x-auto whitespace-nowrap">
+        <div className="flex space-x-4 items-end">
+          <div className="flex flex-col items-center cursor-pointer relative max-w-[70px]" onClick={handleOpenNoteModal}>
+            <div className="mb-1 bg-gray-100 p-2 rounded-lg w-[70px] h-[40px] flex items-center justify-center">
+              <span className="text-xs text-gray-500">Create</span>
+            </div>
+            <div className="relative">
+              <Avatar className="w-14 h-14 bg-gray-200 border-2 border-white">
+                <AvatarFallback className="text-sm">
+                  {currentUser?.name[0].toUpperCase() || "+"}
+                </AvatarFallback>
+              </Avatar>
+              <div className="absolute -bottom-0 -right-0 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white border-2 border-white">
+                <Plus className="h-4 w-4" />
               </div>
             </div>
+            <span className="text-xs mt-1 w-full text-center truncate">
+              Create story
+            </span>
+          </div>
+
+          {myNote && (
+            <NoteItem 
+              note={myNote} 
+              onClick={() => handleNoteClick(myNote)} 
+              showDelete={true}
+              onDelete={() => handleDeleteNote(myNote.id)}
+              compact={true}
+            />
           )}
 
-          {otherUsersNotes.map(note => {
-            const noteCreator = onlineUsers.find(user => user.id === note.creatorId);
-            return (
-              <div
-                key={note.id}
-                className="flex flex-col items-center cursor-pointer relative mt-8"
-                onClick={() => handleNoteClick(note)}
-              >
-                <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-white px-3 py-2 rounded-full shadow-sm border border-gray-200 text-xs max-w-[150px] truncate">
-                  {note.content}
-                </div>
-                
-                <div className="relative">
-                  <Avatar className="w-14 h-14">
-                    <AvatarFallback className="bg-gray-200 text-lg">
-                      {noteCreator?.name[0].toUpperCase() || '?'}
-                    </AvatarFallback>
-                  </Avatar>
-                  {noteCreator?.isOnline && (
-                    <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white" />
-                  )}
-                </div>
-                <span className="text-xs mt-1 max-w-[60px] truncate">{noteCreator?.name || 'User'}</span>
-              </div>
-            );
-          })}
+          {filteredAndSortedUsers
+            .filter(user => userNotesMap.has(user.id) || user.isOnline)
+            .slice(0, 10)
+            .map((user) => {
+              const userNote = userNotesMap.get(user.id);
+              
+              if (userNote) {
+                return (
+                  <NoteItem 
+                    key={user.id}
+                    note={userNote}
+                    onClick={() => handleNoteClick(userNote)}
+                    compact={true}
+                  />
+                );
+              }
 
-          {onlineUsersFiltered.map((user) => (
-            <div
-              key={user.id}
-              onClick={() => handleUserClick(user)}
-              className="flex flex-col items-center cursor-pointer"
-            >
-              <div className="relative">
-                <Avatar className="w-14 h-14">
-                  <AvatarFallback className="bg-gray-200 text-lg">
-                    {user.name[0].toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white" />
-              </div>
-              <span className="text-xs mt-1 max-w-[60px] truncate">{user.name}</span>
-            </div>
-          ))}
+              return (
+                <div key={user.id} className="flex flex-col items-center relative max-w-[70px]" onClick={() => handleUserClick(user)}>
+                  <div className="mb-1 bg-transparent p-2 rounded-lg w-[70px] h-[40px] invisible">
+                    <span className="text-xs text-transparent">Placeholder</span>
+                  </div>
+                  <div className="relative">
+                    <Avatar className="w-14 h-14 border-2 border-gray-200">
+                      <AvatarFallback className="bg-gray-200 text-sm">
+                        {user.name[0].toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    {user.isOnline && (
+                      <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white" />
+                    )}
+                  </div>
+                  <span className="text-xs mt-1 w-full text-center truncate">
+                    {user.name}
+                  </span>
+                </div>
+              );
+            })}
         </div>
       </div>
+
+      <div className="h-px bg-gray-200 mx-2 mb-1"></div>
 
       <div className="flex-1 overflow-y-auto">
         {filteredAndSortedUsers.map((user) => {
           const lastMessage = getLastMessage(user.id);
           const unreadCount = getUnreadCount(user.id);
+          const userNote = userNotesMap.get(user.id);
           
           return (
             <div
               key={user.id}
               onClick={() => handleUserClick(user)}
-              className="p-4 border-b border-gray-100 cursor-pointer transition-colors hover:bg-gray-50"
+              className="px-4 py-3 cursor-pointer transition-colors hover:bg-gray-50"
             >
               <div className="flex items-center space-x-3">
                 <div className="relative">
@@ -253,7 +232,7 @@ const UserList = () => {
                     </AvatarFallback>
                   </Avatar>
                   {user.isOnline && (
-                    <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white" />
+                    <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white" />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -278,9 +257,14 @@ const UserList = () => {
                       {lastMessage.content}
                     </p>
                   )}
+                  {!lastMessage && userNote && (
+                    <p className="text-sm text-blue-500 truncate">
+                      Has shared a note
+                    </p>
+                  )}
                 </div>
                 {unreadCount > 0 && (
-                  <div className="w-5 h-5 rounded-full bg-[#46C8B6] text-white text-xs flex items-center justify-center">
+                  <div className="w-5 h-5 rounded-full bg-blue-500 text-white text-xs flex items-center justify-center">
                     {unreadCount}
                   </div>
                 )}
