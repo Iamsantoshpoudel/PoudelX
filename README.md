@@ -106,7 +106,7 @@ After cloning the repository and installing dependencies (as mentioned in the "G
 git clone https://github.com/Iamsantoshpoudel/PoudelX-Chat-app.git
 ```
 ```
-cd PoudelX-Chat-app
+cd PoudelX
 npm install
 ```
 <h1>
