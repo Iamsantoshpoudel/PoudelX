@@ -36,7 +36,7 @@ const Landing: React.FC = () => {
       const timeout = setTimeout(() => {
         setVisibleMessages([]);
         setCurrentIndex(0);
-      }, 1000); // Wait 2 seconds before restarting
+      },1000); // Wait 2 seconds before restarting
       return () => clearTimeout(timeout);
     }
 
@@ -50,7 +50,7 @@ const Landing: React.FC = () => {
         return [...prev, demoMessages[currentIndex]];
       });
       setCurrentIndex(prev => prev + 1);
-    }, 2000); // Slow down the messages even more - show new one every 3 seconds
+    }, 3000); // Slow down the messages even more - show new one every 3 seconds
 
     return () => clearTimeout(messageTimeout);
   }, [currentIndex]);
