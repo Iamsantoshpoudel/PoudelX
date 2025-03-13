@@ -50,7 +50,7 @@ const Landing: React.FC = () => {
         return [...prev, demoMessages[currentIndex]];
       });
       setCurrentIndex(prev => prev + 1);
-    }, 4000); // Slow down the messages even more - show new one every 3 seconds
+    }, 2000); // Slow down the messages even more - show new one every 3 seconds
 
     return () => clearTimeout(messageTimeout);
   }, [currentIndex]);
