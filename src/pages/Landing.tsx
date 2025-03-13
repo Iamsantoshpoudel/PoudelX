@@ -36,7 +36,7 @@ const Landing: React.FC = () => {
       const timeout = setTimeout(() => {
         setVisibleMessages([]);
         setCurrentIndex(0);
-      }, 2000); // Wait 2 seconds before restarting
+      }, 1000); // Wait 2 seconds before restarting
       return () => clearTimeout(timeout);
     }
 
