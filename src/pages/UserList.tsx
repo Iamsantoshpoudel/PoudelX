@@ -90,10 +90,10 @@ const UserList = () => {
   });
 
   const filteredAndSortedUsers = onlineUsers
-    .filter(user => 
-      user.id !== currentUser?.id && 
-      user.name.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+  .filter(user => 
+    user.id !== currentUser?.id &&
+    (user.name?.toLowerCase() ?? "").includes((searchQuery ?? "").toLowerCase())
+  )
     .sort((a, b) => {
       if (a.isOnline && !b.isOnline) return -1;
       if (!a.isOnline && b.isOnline) return 1;
@@ -224,11 +224,11 @@ const UserList = () => {
               onClick={() => handleUserClick(user)}
               className="px-4 py-3 cursor-pointer transition-colors hover:bg-gray-50"
             >
-              <div className="flex items-center space-x-3">
+              <div  className="flex items-center space-x-3">
                 <div className="relative">
                   <Avatar className="w-12 h-12">
                     <AvatarFallback className="bg-gray-200">
-                      {user.name[0].toUpperCase()}
+                    {user.name?.[0]?.toUpperCase() ?? ""}
                     </AvatarFallback>
                   </Avatar>
                   {user.isOnline && (
