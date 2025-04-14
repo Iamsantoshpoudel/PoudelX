@@ -5,7 +5,6 @@ import Layout from "./components/Layout";
 import NotFound from "./pages/NotFound";
 import Landing from "./pages/Landing";
 import Loader from "./components/Loader";
-import AuthRedirector from "./pages/Auth";
 
 // Lazy load pages
 const Chat = lazy(() => import("./pages/Chat"));
@@ -17,10 +16,6 @@ const Profile = lazy(() => import("./pages/Profile"));
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <AuthRedirector />,
-  },
-  {
-    path: "/landing",
     element: <Landing />,
   },
   {
