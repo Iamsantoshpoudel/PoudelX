@@ -36,7 +36,7 @@ const Profile = () => {
   }, [id, currentUser, onlineUsers, navigate]);
 
   if (isLoading) {
-    return <Loader />;
+    return <Loader type="skeleton" skeletonType="profile"/>;
   }
 
   return (

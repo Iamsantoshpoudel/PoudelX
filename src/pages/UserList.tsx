@@ -17,17 +17,17 @@ import { toast } from '@/components/ui/use-toast';
 const UserList = () => {
   const { onlineUsers, currentUser, messages, notes, deleteNote } = useChatStore();
   const [searchQuery, setSearchQuery] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
+  // const [isLoading, setIsLoading] = useState(true);
   const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     setIsLoading(false);
+  //   }, 100);
+  //   return () => clearTimeout(timer);
+  // }, []);
 
   const getLastMessage = (userId: string) => {
     return messages
@@ -108,9 +108,9 @@ const UserList = () => {
       return new Date(bLastMessage.timestamp).getTime() - new Date(aLastMessage.timestamp).getTime();
     });
 
-  if (isLoading) {
-    return <Loader type="skeleton" skeletonType="userList" />;
-  }
+  // if (isLoading) {
+  //   return <Loader type="skeleton" skeletonType="userList" />;
+  // }
 
   return (
     <div className="flex flex-col h-full bg-background">

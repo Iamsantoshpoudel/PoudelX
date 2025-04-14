@@ -5,6 +5,7 @@
 
 * {
   user-select: none;
+  scroll-behavior: smooth;
   
 }
 

@@ -16,7 +16,7 @@ const Chat = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 1000);
+    }, 100);
 
     return () => clearTimeout(timer);
   }, []);
@@ -61,9 +61,9 @@ const Chat = () => {
     }
   }, [currentUser]);
 
-  if (isLoading) {
-    return <Loader />;
-  }
+  // if (isLoading) {
+  //   return <Loader type="skeleton" skeletonType="chat"/>;
+  // }
 
   const handleViewProfile = () => {
     if (selectedUser) {

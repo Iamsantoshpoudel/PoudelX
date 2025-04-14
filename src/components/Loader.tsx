@@ -76,9 +76,6 @@ const Loader: React.FC<LoaderProps> = ({ type = "spinner", skeletonType = "userL
       case "profile":
         return (
           <div className="h-full animate-pulse">
-            <div className="p-4 border-b border-gray-200">
-              <div className="h-8 w-8 bg-gray-200 rounded"></div>
-            </div>
             <div className="p-6 space-y-6">
               <div className="flex flex-col items-center space-y-4">
                 <div className="w-24 h-24 rounded-full bg-gray-200"></div>

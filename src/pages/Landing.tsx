@@ -70,7 +70,7 @@ const Landing: React.FC = () => {
       const timeout = setTimeout(() => {
         setVisibleMessages([]);
         setCurrentIndex(0);
-      }, 1000); // Wait 2 seconds before restarting
+      }, 100); // Wait 2 seconds before restarting
       return () => clearTimeout(timeout);
     }
 
@@ -96,23 +96,6 @@ const Landing: React.FC = () => {
     }
   }, [visibleMessages]);
 
-  //redirect the user if he logins
-
-  const [isLoading, setIsLoading] = useState(true);
-  useEffect(() => {
-    const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, (user: User | null) => {
-      if (user) {
-        // ✅ User is logged in, redirect to /userlist
-        navigate("/userlist");
-      } else {
-        // ❌ Not logged in
-        setIsLoading(false);
-      }
-    });
-
-    return () => unsubscribe();
-  }, [navigate]);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#ddecec] text-white overflow-hidden">
