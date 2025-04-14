@@ -10,23 +10,28 @@ export default function AuthRedirector() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Make sure this only runs once, and captures the correct state
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCheckingAuth(false); // Always stop loader
       if (user) {
+        localStorage.setItem("isLoggedIn", "true");
         navigate("/userlist", { replace: true });
       } else {
+        localStorage.removeItem("isLoggedIn");
         navigate("/landing", { replace: true });
       }
+      setCheckingAuth(false);
     });
 
     return () => unsubscribe();
   }, [navigate]);
 
-  if (checkingAuth) {
-    return <Loader />;
+  // 👇 Check localStorage to speed up initial decision
+  if (checkingAuth && localStorage.getItem("isLoggedIn") === "true") {
+    // Quickly redirect while Firebase finishes loading
+    navigate("/userlist", { replace: true });
+    return null;
   }
 
-  // Optional fallback if something goes wrong
+  if (checkingAuth) return <Loader />;
+
   return null;
 }
