@@ -102,24 +102,34 @@ const UserProfile = ({ user, showBackButton, onBack }: UserProfileProps) => {
 
   const handleLogout = async () => {
     try {
+      // 1. Firebase logout
       await signOut(auth);
-      
+  
+      // 2. Clear app state (your custom user state)
       setCurrentUser({
         id: '',
         name: '',
         isOnline: false,
         lastSeen: new Date().toISOString()
       });
-      
-      sessionStorage.removeItem('currentUser');
+  
+      // 3. Clear storage and cookies
+      sessionStorage.clear(); // instead of removeItem individually
+      localStorage.clear();   // clear if you used localStorage for anything
       document.cookie = 'currentUser=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-      
-      navigate('/');
-      
+  
+      // 4. (Optional) Reset Redux state, Zustand, or any global state store
+      // Example: resetStore() or useStore.setState({})
+  
+      // 5. Redirect to home/login
+      navigate('/landing');
+  
+      // 6. Show logout toast
       toast({
         title: "Logged out",
         description: "You have been logged out successfully."
       });
+  
     } catch (error: any) {
       toast({
         title: "Error",
